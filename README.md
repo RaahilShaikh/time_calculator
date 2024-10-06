@@ -1,4 +1,4 @@
-# my_calculator
+# time_calculator
 
 A new Flutter project.
 

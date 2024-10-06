@@ -14,5 +14,7 @@ class StringConstants {
   static const String lbl9 = '9';
   static const String lblPlus = '+';
   static const String lblMinus = '-';
+  static const String lblMultiplication = 'x';
+  static const String lblDivision = '/';
   static const String lblEqualTo = '=';
 }

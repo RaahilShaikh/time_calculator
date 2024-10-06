@@ -64,16 +64,36 @@ class CalculatorScreen extends StatelessWidget {
                         Expanded(
                           child: CustomButton(
                             title: StringConstants.lblAC,
+                            color: ColorConstant.lightGreyColor,
+                            textColor: ColorConstant.blackColor,
                             onTap: () => controller.allClear(),
                           ),
                         ),
                         CustomSpacer.horizontalSpace(10),
 
-                        /// lbl c
                         Expanded(
-                          child: CustomButton(
-                            title: StringConstants.lblC,
-                            onTap: () => controller.clear(),
+                          child: Row(
+                            children: [
+                              /// lbl c
+                              Expanded(
+                                child: CustomButton(
+                                  title: StringConstants.lblC,
+                                  color: ColorConstant.lightGreyColor,
+                                  textColor: ColorConstant.blackColor,
+                                  onTap: () => controller.clear(),
+                                ),
+                              ),
+                              CustomSpacer.horizontalSpace(10),
+
+                              /// lbl division
+                              Expanded(
+                                child: CustomButton(
+                                  title: StringConstants.lblDivision,
+                                  color: ColorConstant.primaryColor,
+                                  onTap: () => controller.setOperator(StringConstants.lblDivision),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -110,12 +130,12 @@ class CalculatorScreen extends StatelessWidget {
                         ),
                         CustomSpacer.horizontalSpace(10),
 
-                        /// lbl .
+                        /// lbl multiplication
                         Expanded(
                           child: CustomButton(
-                            title: '.',
+                            title: StringConstants.lblMultiplication,
                             color: ColorConstant.primaryColor,
-                            onTap: () {},
+                            onTap: () => controller.setOperator(StringConstants.lblMultiplication),
                           ),
                         ),
                       ],
