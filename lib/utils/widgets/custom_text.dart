@@ -26,12 +26,12 @@ class CustomText extends StatelessWidget {
     this.fontStyle = FontStyle.normal,
   });
 
-  const CustomText.lightGreyColor20Medium({
+  const CustomText.primaryColor25Medium({
     super.key,
     required this.text,
     this.fontWeight = FontWeight.w500,
-    this.textSize = 20,
-    this.color = ColorConstant.lightGreyColor,
+    this.textSize = 25,
+    this.color = ColorConstant.primaryColor,
     this.textOverflow,
     this.textAlign = TextAlign.start,
     this.textDecoration = TextDecoration.none,
@@ -44,6 +44,19 @@ class CustomText extends StatelessWidget {
     required this.text,
     this.fontWeight = FontWeight.bold,
     this.textSize = 30,
+    this.color = ColorConstant.whiteColor,
+    this.textOverflow,
+    this.textAlign = TextAlign.start,
+    this.textDecoration = TextDecoration.none,
+    this.maxLine,
+    this.fontStyle = FontStyle.normal,
+  });
+
+  const CustomText.whiteColor20Bold({
+    super.key,
+    required this.text,
+    this.fontWeight = FontWeight.bold,
+    this.textSize = 23,
     this.color = ColorConstant.whiteColor,
     this.textOverflow,
     this.textAlign = TextAlign.start,

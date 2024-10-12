@@ -18,6 +18,11 @@ class CalculatorScreen extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16.w).copyWith(top: 10.h),
                 child: Column(
                   children: [
+                    CustomText.whiteColor20Bold(
+                      text: 'Result : ${controller.convertToHHMM(controller.resultInMinutes.value)}',
+                      color: Colors.white,
+                    ),
+                    CustomSpacer.verticalSpace(10),
                     Expanded(
                       child: Container(
                         alignment: Alignment.bottomRight,
@@ -31,12 +36,13 @@ class CalculatorScreen extends StatelessWidget {
                           thumbVisibility: true,
                           radius: Radius.circular(5.r),
                           child: SingleChildScrollView(
+                            reverse: true,
                             child: Container(
                               width: double.infinity,
                               alignment: Alignment.bottomRight,
                               padding: EdgeInsets.only(right: 15.w),
-                              child: CustomText.lightGreyColor20Medium(
-                                text: controller.history.value,
+                              child: CustomText.primaryColor25Medium(
+                                text: controller.history.value.join(' ').toString(),
                               ),
                             ),
                           ),
@@ -47,11 +53,16 @@ class CalculatorScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        CustomText.lightGreyColor20Medium(
-                          text: controller.count.value.toString(),
+                        CustomText.primaryColor25Medium(
+                          text: controller.history.length.toString(),
                         ),
-                        CustomText.whiteColor50Bold(
-                          text: controller.displayValue.value,
+                        CustomSpacer.horizontalSpace(5),
+                        Expanded(
+                          child: CustomText.whiteColor50Bold(
+                            text: controller.displayValue.value,
+                            maxLine: 1,
+                            textAlign: TextAlign.right,
+                          ),
                         ),
                       ],
                     ),
@@ -66,34 +77,17 @@ class CalculatorScreen extends StatelessWidget {
                             title: StringConstants.lblAC,
                             color: ColorConstant.lightGreyColor,
                             textColor: ColorConstant.blackColor,
-                            onTap: () => controller.allClear(),
+                            onTap: () => controller.onAllClear(),
                           ),
                         ),
                         CustomSpacer.horizontalSpace(10),
 
                         Expanded(
-                          child: Row(
-                            children: [
-                              /// lbl c
-                              Expanded(
-                                child: CustomButton(
-                                  title: StringConstants.lblC,
-                                  color: ColorConstant.lightGreyColor,
-                                  textColor: ColorConstant.blackColor,
-                                  onTap: () => controller.clear(),
-                                ),
-                              ),
-                              CustomSpacer.horizontalSpace(10),
-
-                              /// lbl division
-                              Expanded(
-                                child: CustomButton(
-                                  title: StringConstants.lblDivision,
-                                  color: ColorConstant.primaryColor,
-                                  onTap: () => controller.setOperator(StringConstants.lblDivision),
-                                ),
-                              ),
-                            ],
+                          child: CustomButton(
+                            title: StringConstants.lblC,
+                            color: ColorConstant.lightGreyColor,
+                            textColor: ColorConstant.blackColor,
+                            onTap: () => controller.onClear(),
                           ),
                         ),
                       ],
@@ -107,7 +101,7 @@ class CalculatorScreen extends StatelessWidget {
                         Expanded(
                           child: CustomButton(
                             title: StringConstants.lbl7,
-                            onTap: () => controller.addNumber(StringConstants.lbl7),
+                            onTap: () => controller.onInput(StringConstants.lbl7),
                           ),
                         ),
                         CustomSpacer.horizontalSpace(10),
@@ -116,7 +110,7 @@ class CalculatorScreen extends StatelessWidget {
                         Expanded(
                           child: CustomButton(
                             title: StringConstants.lbl8,
-                            onTap: () => controller.addNumber(StringConstants.lbl8),
+                            onTap: () => controller.onInput(StringConstants.lbl8),
                           ),
                         ),
                         CustomSpacer.horizontalSpace(10),
@@ -125,7 +119,7 @@ class CalculatorScreen extends StatelessWidget {
                         Expanded(
                           child: CustomButton(
                             title: StringConstants.lbl9,
-                            onTap: () => controller.addNumber(StringConstants.lbl9),
+                            onTap: () => controller.onInput(StringConstants.lbl9),
                           ),
                         ),
                         CustomSpacer.horizontalSpace(10),
@@ -135,7 +129,7 @@ class CalculatorScreen extends StatelessWidget {
                           child: CustomButton(
                             title: StringConstants.lblMultiplication,
                             color: ColorConstant.primaryColor,
-                            onTap: () => controller.setOperator(StringConstants.lblMultiplication),
+                            onTap: () => controller.onOperatorSelected(StringConstants.lblMultiplication),
                           ),
                         ),
                       ],
@@ -149,7 +143,7 @@ class CalculatorScreen extends StatelessWidget {
                         Expanded(
                           child: CustomButton(
                             title: StringConstants.lbl4,
-                            onTap: () => controller.addNumber(StringConstants.lbl4),
+                            onTap: () => controller.onInput(StringConstants.lbl4),
                           ),
                         ),
                         CustomSpacer.horizontalSpace(10),
@@ -158,7 +152,7 @@ class CalculatorScreen extends StatelessWidget {
                         Expanded(
                           child: CustomButton(
                             title: StringConstants.lbl5,
-                            onTap: () => controller.addNumber(StringConstants.lbl5),
+                            onTap: () => controller.onInput(StringConstants.lbl5),
                           ),
                         ),
                         CustomSpacer.horizontalSpace(10),
@@ -167,7 +161,7 @@ class CalculatorScreen extends StatelessWidget {
                         Expanded(
                           child: CustomButton(
                             title: StringConstants.lbl6,
-                            onTap: () => controller.addNumber(StringConstants.lbl6),
+                            onTap: () => controller.onInput(StringConstants.lbl6),
                           ),
                         ),
                         CustomSpacer.horizontalSpace(10),
@@ -177,7 +171,7 @@ class CalculatorScreen extends StatelessWidget {
                           child: CustomButton(
                             title: StringConstants.lblMinus,
                             color: ColorConstant.primaryColor,
-                            onTap: () => controller.setOperator(StringConstants.lblMinus),
+                            onTap: () => controller.onOperatorSelected(StringConstants.lblMinus),
                           ),
                         ),
                       ],
@@ -191,7 +185,7 @@ class CalculatorScreen extends StatelessWidget {
                         Expanded(
                           child: CustomButton(
                             title: StringConstants.lbl1,
-                            onTap: () => controller.addNumber(StringConstants.lbl1),
+                            onTap: () => controller.onInput(StringConstants.lbl1),
                           ),
                         ),
                         CustomSpacer.horizontalSpace(10),
@@ -200,7 +194,7 @@ class CalculatorScreen extends StatelessWidget {
                         Expanded(
                           child: CustomButton(
                             title: StringConstants.lbl2,
-                            onTap: () => controller.addNumber(StringConstants.lbl2),
+                            onTap: () => controller.onInput(StringConstants.lbl2),
                           ),
                         ),
                         CustomSpacer.horizontalSpace(10),
@@ -209,7 +203,7 @@ class CalculatorScreen extends StatelessWidget {
                         Expanded(
                           child: CustomButton(
                             title: StringConstants.lbl3,
-                            onTap: () => controller.addNumber(StringConstants.lbl3),
+                            onTap: () => controller.onInput(StringConstants.lbl3),
                           ),
                         ),
                         CustomSpacer.horizontalSpace(10),
@@ -219,7 +213,7 @@ class CalculatorScreen extends StatelessWidget {
                           child: CustomButton(
                             title: StringConstants.lblPlus,
                             color: ColorConstant.primaryColor,
-                            onTap: () => controller.setOperator(StringConstants.lblPlus),
+                            onTap: () => controller.onOperatorSelected(StringConstants.lblPlus),
                           ),
                         ),
                       ],
@@ -231,9 +225,25 @@ class CalculatorScreen extends StatelessWidget {
                       children: [
                         /// lbl 0
                         Expanded(
-                          child: CustomButton(
-                            title: StringConstants.lbl0,
-                            onTap: () => controller.addNumber(StringConstants.lbl0),
+                          child: Row(
+                            children: [
+                              /// single 0
+                              Expanded(
+                                child: CustomButton(
+                                  title: StringConstants.lbl0,
+                                  onTap: () => controller.onInput(StringConstants.lbl0),
+                                ),
+                              ),
+                              CustomSpacer.horizontalSpace(10),
+
+                              /// double 0
+                              Expanded(
+                                child: CustomButton(
+                                  title: StringConstants.lbl00,
+                                  onTap: () => controller.onInput(StringConstants.lbl00),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         CustomSpacer.horizontalSpace(10),
@@ -243,7 +253,7 @@ class CalculatorScreen extends StatelessWidget {
                           child: CustomButton(
                             title: StringConstants.lblEqualTo,
                             color: ColorConstant.primaryColor,
-                            onTap: () => controller.calculateTime(),
+                            onTap: () => controller.onEquals(),
                           ),
                         ),
                       ],

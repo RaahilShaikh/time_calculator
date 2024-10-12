@@ -3,6 +3,7 @@ class StringConstants {
   static const String lblAC = 'AC';
   static const String lblC = 'C';
   static const String lbl0 = '0';
+  static const String lbl00 = '00';
   static const String lbl1 = '1';
   static const String lbl2 = '2';
   static const String lbl3 = '3';

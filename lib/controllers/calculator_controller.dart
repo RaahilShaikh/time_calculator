@@ -1,15 +1,18 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:my_calculator/utils/constants/constants.dart';
 
 class CalculatorController extends GetxController {
   RxString displayValue = RxString('00:00');
-  RxString firstTime = RxString('');
-  RxString secondTime = RxString('');
-  RxString timeInput = RxString('');
-  RxString operator = RxString('');
-  RxString history = RxString('');
-  RxBool enteringSecondTime = RxBool(false);
-  RxBool resultCalculated = RxBool(false);
-  RxInt count = RxInt(0); // Count for time inputs, excluding operators
+  RxList<String> history = RxList([]);
+  RxString currentOperation = RxString('');
+  RxString lastOperation = RxString('');
+  RxInt inputCount = RxInt(0);
+  RxInt resultInMinutes = RxInt(0);
+  RxString lastInput = RxString('');
+  RxInt firstValueInMinutes = RxInt(0);
+  RxBool isOperationSelected = RxBool(false);
+  RxBool isEqualsPressed = RxBool(false);
 
   @override
   void onInit() {
@@ -21,135 +24,149 @@ class CalculatorController extends GetxController {
     super.onClose();
   }
 
-  // Add number to time input and format as HH:MM
-  void addNumber(String number) {
-    if (timeInput.value.length < 4) {
-      timeInput.value += number;
-      formatTime();
-    }
-  }
-
-  // Format the time input to display it in HH:MM format
-  void formatTime() {
-    String paddedInput = timeInput.value.padLeft(4, '0');
-    String hours = paddedInput.substring(0, 2);
-    String minutes = paddedInput.substring(2, 4);
-
-    displayValue.value = '$hours:$minutes';
-  }
-
-  // Set the operator (+ or -), and save first time
-  void setOperator(String op) {
-    if (timeInput.value.isNotEmpty || displayValue.value != '00:00') {
-      if (firstTime.isEmpty) {
-        firstTime.value = displayValue.value;
-        history.value += '${firstTime.value}$op'; // Append current time and operator to history
-        count.value++; // Increment count only for the first time input
-      } else {
-        if (operator.value.isNotEmpty) {
-          calculateTime(intermediate: true); // Calculate intermediate result
-        }
-        firstTime.value = displayValue.value; // After intermediate, set firstTime to current displayValue
-        history.value += op; // Append operator only to history
-      }
-      operator.value = op; // Update the operator
-      timeInput.value = ''; // Clear the input for the second time
-      displayValue.value = '00:00';
-      enteringSecondTime.value = true;
-    }
-  }
-
-  // Perform the calculation
-  // Perform the calculation
-  void calculateTime({bool intermediate = false}) {
-    if (firstTime.isNotEmpty && (timeInput.value.isNotEmpty || displayValue.value != '00:00') && operator.isNotEmpty) {
-      secondTime.value = displayValue.value;
-      history.value += secondTime.value; // Append second value to history
-      count.value++; // Increment count for the second time input
-
-      // Parse times into hours and minutes
-      List<String> time1 = firstTime.value.split(':');
-      List<String> time2 = secondTime.value.split(':');
-
-      int hours1 = int.parse(time1[0]);
-      int minutes1 = int.parse(time1[1]);
-      int hours2 = int.parse(time2[0]);
-      int minutes2 = int.parse(time2[1]);
-
-      int resultHours = 0, resultMinutes = 0;
-
-      // Perform the operation based on the operator
-      if (operator.value == '+') {
-        resultMinutes = minutes1 + minutes2;
-        resultHours = hours1 + hours2 + (resultMinutes ~/ 60);
-        resultMinutes = resultMinutes % 60;
-      } else if (operator.value == '-') {
-        resultMinutes = minutes1 - minutes2;
-        resultHours = hours1 - hours2;
-        if (resultMinutes < 0) {
-          resultMinutes += 60;
-          resultHours--;
-        }
-      }
-
-      // Format and set the result
-      displayValue.value = '${resultHours.toString().padLeft(2, '0')}:${resultMinutes.toString().padLeft(2, '0')}';
-
-      // If this is a final calculation
-      if (!intermediate) {
-        history.value += '='; // Add the equals sign to the history
-        firstTime.value = displayValue.value; // Set the result as the first time for future operations
-        operator.value = ''; // Clear operator after calculation
-      } else {
-        // If it's an intermediate calculation, just clear the operator for the next operation
-        operator.value = '';
-      }
-
-      // Reset the second time and input
-      secondTime.value = '';
-      enteringSecondTime.value = false;
-      timeInput.value = '';
-
+  // Helper to convert HH:MM input into minutes
+  int convertToMinutes(String input) {
+    input = input.padLeft(2, '0'); // Ensure at least 2 digits
+    if (input.length <= 2) {
+      // If input is 2 digits or less, it's considered as minutes only
+      return int.parse(input);
     } else {
-      // Handle the case when user just presses equals without valid input
-      if (firstTime.isNotEmpty) {
-        displayValue.value = firstTime.value; // Show the previous first time
-      }
-      secondTime.value = '';
-      enteringSecondTime.value = false;
-      timeInput.value = '';
-
-      if(operator.value.isNotEmpty){
-        // Modify history to reflect the last operation properly
-        if (history.value.isNotEmpty) {
-          int lastIndex = history.value.lastIndexOf(operator.value);
-          if (lastIndex != -1) {
-            // Replace the last operator with "="
-            String result = '${history.value.substring(0, lastIndex)}=';
-            history.value = result;
-            operator.value = ''; // Clear operator after calculation
-          }
-        }
-      }
+      // If input has more than 2 digits, treat it as HH:MM
+      final hours = int.parse(input.substring(0, input.length - 2));
+      final minutes = int.parse(input.substring(input.length - 2));
+      return hours * 60 + minutes;
     }
   }
 
+  // Convert minutes back to HH:MM
+  String convertToHHMM(int totalMinutes) {
+    final hours = (totalMinutes ~/ 60).toString();
+    final minutes = (totalMinutes % 60).toString().padLeft(2, '0');
+    return '$hours:$minutes';
+  }
 
-  // Clear the current input
-  void clear() {
-    timeInput.value = '';
+  // Handle input (when 1-9, 0, 00 are pressed)
+  void onInput(String value) {
+    lastInput.value += value;
+
+    // If the current operation is multiplication, display the raw value (as integer)
+    if (currentOperation.value == StringConstants.lblMultiplication) {
+      displayValue.value = lastInput.value; // Don't format as HH:MM for multiplication
+    } else {
+      // Otherwise, format as HH:MM for + and - operations
+      displayValue.value = formatInput(lastInput.value);
+    }
+
+    inputCount.value++;
+  }
+
+  // Format the input dynamically to HH:MM or just MM if only minutes are provided
+  String formatInput(String input) {
+    input = input.padLeft(2, '0'); // Ensure at least 2 digits
+    if (input.length <= 2) {
+      // If input is 2 digits or less, treat it as minutes only
+      final minutes = input.padLeft(2, '0');
+      return '00:$minutes'; // Display as 00:MM
+    } else {
+      // If input has more than 2 digits, treat it as HH:MM
+      final minutes = input.substring(input.length - 2);
+      final hours = input.substring(0, input.length - 2);
+      return '$hours:$minutes'; // Display as HH:MM
+    }
+  }
+
+  // Handle operator (+, -, x) click
+  void onOperatorSelected(String operator) {
+    lastOperation.value = currentOperation.value;
+
+    if (isEqualsPressed.value) {
+      // Append to the last history entry if equals was pressed
+      history.last = '${history.last} $operator';
+      isEqualsPressed.value = false; // Reset equals flag
+      lastInput.value = ''; // Clear the input for the next entry
+    } else if (lastInput.isNotEmpty) {
+      if (currentOperation.isNotEmpty) {
+        // Calculate the result and store for chaining
+        resultInMinutes.value = calculateResult();
+        firstValueInMinutes.value = resultInMinutes.value;
+      } else {
+        // Store first value for initial operation
+        firstValueInMinutes.value = convertToMinutes(lastInput.value);
+      }
+
+      // Add the current operation to the history
+      history.add('${formatInput(lastInput.value)} $operator');
+      lastInput.value = ''; // Clear the input for the next entry
+    }
+
+    // Set the selected operator for the next operation
+    currentOperation.value = operator;
+    displayValue.value = '0'; // Reset display for new input
+  }
+
+  // Perform calculation with the current operation
+  int calculateResult() {
+    int secondValue;
+
+    if (currentOperation.value == StringConstants.lblMultiplication) {
+      // For multiplication, treat the last input as a raw integer
+      secondValue = int.parse(lastInput.value); // Scalar value for multiplication
+    } else {
+      // For addition and subtraction, convert the input to minutes (HH:MM format)
+      secondValue = convertToMinutes(lastInput.value);
+    }
+
+    if (currentOperation.value == StringConstants.lblPlus) {
+      return firstValueInMinutes.value + secondValue;
+    } else if (currentOperation.value == StringConstants.lblMinus) {
+      return firstValueInMinutes.value - secondValue;
+    } else if (currentOperation.value == StringConstants.lblMultiplication) {
+      return firstValueInMinutes.value * secondValue;
+    }
+    return firstValueInMinutes.value;
+  }
+
+  // Handle '=' click to calculate and display the final result
+  void onEquals() {
+    if (lastInput.isNotEmpty) {
+      resultInMinutes.value = calculateResult();
+
+      // Update the history with the final result
+      if (currentOperation.value == StringConstants.lblMultiplication) {
+        history.add('${lastInput.value} = ${convertToHHMM(resultInMinutes.value)}');
+      } else {
+        history.add('${formatInput(lastInput.value)} = ${convertToHHMM(resultInMinutes.value)}');
+      }
+
+      // Display the final result in HH:MM format
+      displayValue.value = convertToHHMM(resultInMinutes.value);
+
+      // Set the result as the first value for the next operation
+      firstValueInMinutes.value = resultInMinutes.value;
+
+      // Update lastInput to the result for further chaining
+      lastInput.value = convertToHHMM(resultInMinutes.value);
+
+      // Reset the current operation
+      currentOperation.value = '';
+      isEqualsPressed.value = true; // Flag that equals was pressed
+    }
+  }
+
+  // Handle C (clear current input)
+  void onClear() {
+    lastInput.value = '';
     displayValue.value = '00:00';
   }
 
-  // Clear everything (All Clear)
-  void allClear() {
-    firstTime.value = '';
-    secondTime.value = '';
-    operator.value = '';
-    enteringSecondTime.value = false;
-    timeInput.value = '';
+  // Handle AC (all clear)
+  void onAllClear() {
+    lastInput.value = '';
+    currentOperation.value = '';
+    resultInMinutes.value = 0;
+    firstValueInMinutes.value = 0;
+    history.clear();
     displayValue.value = '00:00';
-    history.value = ''; // Clear history
-    count.value = 0; // Reset count
+    isEqualsPressed.value = false;
   }
 }
