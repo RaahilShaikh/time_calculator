@@ -2,15 +2,29 @@
 
 ## Overview
 
-The **Time Calculator** is a versatile Flutter application designed to perform arithmetic operations with time values. With a user-friendly interface, this app allows users to easily add, subtract, multiply, and divide time in the format of HH:MM. Whether you're calculating work hours, managing schedules, or simply experimenting with time values, this app simplifies the process!
+The **Time Calculator** is a Flutter-based application designed to calculate time in **HH:MM** format with options for addition, subtraction, and multiplication. It is ideal for tasks like calculating work hours, managing schedules, or performing time-based arithmetic with ease.
 
 ## Features
 
-- **Arithmetic Operations**: Perform addition, subtraction, multiplication, and division with time values. For example, you can calculate **12:00 + 12:00 = 24:00** effortlessly.
-- **Dynamic Updates**: The app updates calculations in real-time as users input values, providing immediate feedback.
-- **History Tracking**: Keep track of all calculations with a dedicated history feature. This allows users to see past operations and results, making it easy to revisit calculations.
-- **Count of Values**: The app not only displays results but also counts the number of values entered, enhancing the user experience and providing clarity.
-- **User-Friendly Interface**: Designed with simplicity in mind, the app offers an intuitive layout for seamless navigation.
+- **Arithmetic Operations**: Perform addition, subtraction, and multiplication with time values in the HH:MM format.
+  - Example: Calculate **12:00 + 12:00 = 24:00**.
+- **Real-Time Results**: Displays calculation results immediately as users input values.
+- **Input Counter**: The app tracks and displays the number of values entered.
+- **History Tracking**: A history feature records all past operations and their results, enabling users to revisit them.
+- **Clear & All Clear Options**: Offers the ability to reset or clear inputs with **Clear (C)** and **All Clear (AC)** buttons for easier control.
+
+## How to Use
+
+1. **Enter Time Values**: Input time values in **HH:MM** format.
+2. **Select Operation**: Choose between addition, subtraction, or multiplication.
+3. **View Results**: The app will display the result in real time as you enter values.
+4. **Review History**: Check the history of past operations for reference.
+5. **Clear/Reset**: Use the **C** or **AC** buttons to clear current inputs or reset the entire calculation.
+
+## Technologies Used
+
+- **Flutter**: Frontend framework for cross-platform mobile development.
+- **GetX**: State management for real-time updates.
 
 ---
 
