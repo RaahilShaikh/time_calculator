@@ -47,17 +47,19 @@ class CalculatorController extends GetxController {
 
   // Handle input (when 1-9, 0, 00 are pressed)
   void onInput(String value) {
-    lastInput.value += value;
+    if (!isEqualsPressed.value) {
+      lastInput.value += value;
 
-    // If the current operation is multiplication, display the raw value (as integer)
-    if (currentOperation.value == StringConstants.lblMultiplication) {
-      displayValue.value = lastInput.value; // Don't format as HH:MM for multiplication
-    } else {
-      // Otherwise, format as HH:MM for + and - operations
-      displayValue.value = formatInput(lastInput.value);
+      // If the current operation is multiplication, display the raw value (as integer)
+      if (currentOperation.value == StringConstants.lblMultiplication) {
+        displayValue.value = lastInput.value; // Don't format as HH:MM for multiplication
+      } else {
+        // Otherwise, format as HH:MM for + and - operations
+        displayValue.value = formatInput(lastInput.value);
+      }
+
+      inputCount.value++;
     }
-
-    inputCount.value++;
   }
 
   // Format the input dynamically to HH:MM or just MM if only minutes are provided
@@ -75,28 +77,43 @@ class CalculatorController extends GetxController {
     }
   }
 
+// 00:55 x 8 + 00:75 + 11:11 x 5
   // Handle operator (+, -, x) click
   void onOperatorSelected(String operator) {
     lastOperation.value = currentOperation.value;
-
+    // If equals was pressed, append to the last history entry and reset
     if (isEqualsPressed.value) {
-      // Append to the last history entry if equals was pressed
       history.last = '${history.last} $operator';
       isEqualsPressed.value = false; // Reset equals flag
       lastInput.value = ''; // Clear the input for the next entry
     } else if (lastInput.isNotEmpty) {
+      // When an input is present and an operator is selected
       if (currentOperation.isNotEmpty) {
-        // Calculate the result and store for chaining
+        // Perform a calculation to chain the operations
         resultInMinutes.value = calculateResult();
         firstValueInMinutes.value = resultInMinutes.value;
       } else {
-        // Store first value for initial operation
+        // Store first value for the operation
         firstValueInMinutes.value = convertToMinutes(lastInput.value);
       }
 
+      if (lastOperation.value == StringConstants.lblMultiplication) {
+        history.add('${(lastInput.value)} $operator');
+      } else {
+        history.add('${formatInput(lastInput.value)} $operator');
+      }
       // Add the current operation to the history
-      history.add('${formatInput(lastInput.value)} $operator');
+      // history.add('${formatInput(lastInput.value)} $operator');
       lastInput.value = ''; // Clear the input for the next entry
+    } else {
+      // If no input is present but an operator is already selected (switch operator case)
+      if (history.isNotEmpty && currentOperation.isNotEmpty) {
+        // Replace the last operator in the history
+        history.last = history.last.replaceAll(currentOperation.value, operator);
+      } else {
+        // If there's no input and no operator yet, add to history with 0 as default input
+        history.add('00:00 $operator');
+      }
     }
 
     // Set the selected operator for the next operation
@@ -128,7 +145,7 @@ class CalculatorController extends GetxController {
 
   // Handle '=' click to calculate and display the final result
   void onEquals() {
-    if (lastInput.isNotEmpty) {
+    if (lastInput.isNotEmpty && currentOperation.value.isNotEmpty) {
       resultInMinutes.value = calculateResult();
 
       // Update the history with the final result
@@ -155,8 +172,10 @@ class CalculatorController extends GetxController {
 
   // Handle C (clear current input)
   void onClear() {
-    lastInput.value = '';
-    displayValue.value = '00:00';
+    if (!isEqualsPressed.value) {
+      lastInput.value = '';
+      displayValue.value = '00:00';
+    }
   }
 
   // Handle AC (all clear)
